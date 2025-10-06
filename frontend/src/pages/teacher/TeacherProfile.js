@@ -42,7 +42,7 @@ const TeacherProfile = () => {
   }
 
   const teachSchool = currentUser?.school;
-
+  //console.log(currentUser?.teachSclass?.sclassName)
   return (
     <>
       <ProfileCard>
