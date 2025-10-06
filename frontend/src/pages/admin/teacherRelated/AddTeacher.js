@@ -37,6 +37,7 @@ const AddTeacher = () => {
   const fields = { name, email, password, role, school, teachSubject, teachSclass }
 
   const submitHandler = (event) => {
+    console.log(registerUser(fields, role))
     event.preventDefault()
     setLoader(true)
     dispatch(registerUser(fields, role))

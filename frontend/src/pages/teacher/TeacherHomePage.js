@@ -1,81 +1,93 @@
-import { Container, Grid, Paper } from '@mui/material'
+import { Container, Grid, Paper } from '@mui/material';
 import SeeNotice from '../../components/SeeNotice';
 import CountUp from 'react-countup';
 import styled from 'styled-components';
-import Students from "../../assets/img1.png";
-import Lessons from "../../assets/subjects.svg";
-import Tests from "../../assets/assignment.svg";
-import Time from "../../assets/time.svg";
+import Students from '../../assets/img1.png';
+import Lessons from '../../assets/subjects.svg';
+import Tests from '../../assets/assignment.svg';
+import Time from '../../assets/time.svg';
 import { getClassStudents, getSubjectDetails } from '../../redux/sclassRelated/sclassHandle';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 
 const TeacherHomePage = () => {
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-    const { currentUser } = useSelector((state) => state.user);
-    const { subjectDetails, sclassStudents } = useSelector((state) => state.sclass);
+  const { currentUser } = useSelector((state) => state.user);
+  const { subjectDetails, sclassStudents } = useSelector((state) => state.sclass);
 
-    const classID = currentUser.teachSclass?._id
-    const subjectID = currentUser.teachSubject?._id
+  // Determine classID and subjectID from first subject or fallback
+  let classID = null;
+  let subjectID = null;
 
-    useEffect(() => {
-        dispatch(getSubjectDetails(subjectID, "Subject"));
-        dispatch(getClassStudents(classID));
-    }, [dispatch, subjectID, classID]);
+  if (currentUser && currentUser.teachSubject) {
+    if (Array.isArray(currentUser.teachSubject) && currentUser.teachSubject.length > 0) {
+      const first = currentUser.teachSubject[0];
+      subjectID = first?._id || null;
+      classID = first?.sclassName?._id || currentUser.teachSclass?._id || null;
+    } else if (currentUser.teachSubject._id) {
+      subjectID = currentUser.teachSubject._id;
+      classID = currentUser.teachSclass?._id || null;
+    }
+  } else {
+    subjectID = currentUser?.teachSubject?._id || null;
+    classID = currentUser?.teachSclass?._id || null;
+  }
 
-    const numberOfStudents = sclassStudents && sclassStudents.length;
-    const numberOfSessions = subjectDetails && subjectDetails.sessions
+  useEffect(() => {
+    if (subjectID) {
+      dispatch(getSubjectDetails(subjectID, 'Subject'));
+    }
+    if (classID) {
+      dispatch(getClassStudents(classID));
+    }
+  }, [dispatch, subjectID, classID]);
 
-    return (
-        <>
-            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                <Grid container spacing={3}>
-                    <Grid item xs={12} md={3} lg={3}>
-                        <StyledPaper>
-                            <img src={Students} alt="Students" />
-                            <Title>
-                                Class Students
-                            </Title>
-                            <Data start={0} end={numberOfStudents} duration={2.5} />
-                        </StyledPaper>
-                    </Grid>
-                    <Grid item xs={12} md={3} lg={3}>
-                        <StyledPaper>
-                            <img src={Lessons} alt="Lessons" />
-                            <Title>
-                                Total Lessons
-                            </Title>
-                            <Data start={0} end={numberOfSessions} duration={5} />
-                        </StyledPaper>
-                    </Grid>
-                    <Grid item xs={12} md={3} lg={3}>
-                        <StyledPaper>
-                            <img src={Tests} alt="Tests" />
-                            <Title>
-                                Tests Taken
-                            </Title>
-                            <Data start={0} end={24} duration={4} />
-                        </StyledPaper>
-                    </Grid>
-                    <Grid item xs={12} md={3} lg={3}>
-                        <StyledPaper>
-                            <img src={Time} alt="Time" />
-                            <Title>
-                                Total Hours
-                            </Title>
-                            <Data start={0} end={30} duration={4} suffix="hrs"/>                        </StyledPaper>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                            <SeeNotice />
-                        </Paper>
-                    </Grid>
-                </Grid>
-            </Container>
-        </>
-    )
-}
+  const numberOfStudents = sclassStudents?.length || 0;
+  const numberOfSessions = subjectDetails?.sessions || 0;
+
+  return (
+    <>
+      <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Grid container spacing={3}>
+          <Grid item xs={12} md={3} lg={3}>
+            <StyledPaper>
+              <img src={Students} alt="Students" />
+              <Title>Class Students</Title>
+              <Data start={0} end={numberOfStudents} duration={2.5} />
+            </StyledPaper>
+          </Grid>
+          <Grid item xs={12} md={3} lg={3}>
+            <StyledPaper>
+              <img src={Lessons} alt="Lessons" />
+              <Title>Total Lessons</Title>
+              <Data start={0} end={numberOfSessions} duration={5} />
+            </StyledPaper>
+          </Grid>
+          <Grid item xs={12} md={3} lg={3}>
+            <StyledPaper>
+              <img src={Tests} alt="Tests" />
+              <Title>Tests Taken</Title>
+              <Data start={0} end={24} duration={4} />
+            </StyledPaper>
+          </Grid>
+          <Grid item xs={12} md={3} lg={3}>
+            <StyledPaper>
+              <img src={Time} alt="Time" />
+              <Title>Total Hours</Title>
+              <Data start={0} end={30} duration={4} suffix="hrs" />
+            </StyledPaper>
+          </Grid>
+          <Grid item xs={12}>
+            <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
+              <SeeNotice />
+            </Paper>
+          </Grid>
+        </Grid>
+      </Container>
+    </>
+  );
+};
 
 const StyledPaper = styled(Paper)`
   padding: 16px;
@@ -92,8 +104,8 @@ const Title = styled.p`
 `;
 
 const Data = styled(CountUp)`
-  font-size: calc(1.3rem + .6vw);
+  font-size: calc(1.3rem + 0.6vw);
   color: green;
 `;
 
-export default TeacherHomePage
+export default TeacherHomePage;

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 const teacherSchema = new mongoose.Schema({
     name: {
@@ -16,34 +16,39 @@ const teacherSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        default: "Teacher"
+        default: "Teacher",
     },
     school: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'admin',
+        ref: "admin",
         required: true,
     },
-    teachSubject: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'subject',
-    },
+    // A teacher can now teach multiple subjects.  Use an array of ObjectIds.
+    teachSubject: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "subject",
+        },
+    ],
     teachSclass: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'sclass',
+        ref: "sclass",
         required: true,
     },
-    attendance: [{
-        date: {
-            type: Date,
-            required: true
+    attendance: [
+        {
+            date: {
+                type: Date,
+                required: true,
+            },
+            presentCount: {
+                type: String,
+            },
+            absentCount: {
+                type: String,
+            },
         },
-        presentCount: {
-            type: String,
-        },
-        absentCount: {
-            type: String,
-        }
-    }]
+    ],
 }, { timestamps: true });
 
-module.exports = mongoose.model("teacher", teacherSchema)
+module.exports = mongoose.model("teacher", teacherSchema);
